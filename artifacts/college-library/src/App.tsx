@@ -152,7 +152,7 @@ function AppShell({ children }: { children: ReactNode }) {
       </nav>
       <div className="sidebar-foot">
         <p>A quieter way to keep knowledge moving.</p>
-        <small>LIBRARY DESK · 2024—25</small>
+        <small>LIBRARY DESK · 2026—27</small>
       </div>
     </aside>
     <main className="main-shell">
@@ -167,7 +167,7 @@ function AppShell({ children }: { children: ReactNode }) {
           </div>
         </div>
         <div className="topbar-actions">
-          <span className="quiet-note">Academic year 2024—25</span>
+          <span className="quiet-note">Academic year 2026—27</span>
           <span className="avatar" aria-label="Librarian profile" data-testid="avatar-librarian">LM</span>
         </div>
       </header>
