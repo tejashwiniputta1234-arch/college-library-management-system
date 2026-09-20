@@ -10,6 +10,14 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: dashboard
+    description: Library dashboard summaries
+  - name: books
+    description: Book catalogue operations
+  - name: students
+    description: Student directory operations
+  - name: circulation
+    description: Book issue and return operations
 paths:
   /healthz:
     get:
@@ -24,7 +32,207 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /dashboard/stats:
+    get:
+      operationId: getDashboardStats
+      tags: [dashboard]
+      summary: Get dashboard statistics
+      responses:
+        "200":
+          description: Dashboard statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStats"
+  /books:
+    get:
+      operationId: getBooks
+      tags: [books]
+      summary: List books
+      parameters:
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Books
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Book"
+    post:
+      operationId: createBook
+      tags: [books]
+      summary: Add a book
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookInput"
+      responses:
+        "201":
+          description: Created book
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+  /books/{id}:
+    patch:
+      operationId: updateBook
+      tags: [books]
+      summary: Edit a book
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookUpdate"
+      responses:
+        "200":
+          description: Updated book
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      operationId: deleteBook
+      tags: [books]
+      summary: Delete a book
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "204":
+          description: Book deleted
+        "409":
+          description: Book has active issues
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /students:
+    get:
+      operationId: getStudents
+      tags: [students]
+      summary: List students
+      responses:
+        "200":
+          description: Students
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Student"
+    post:
+      operationId: createStudent
+      tags: [students]
+      summary: Add a student
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudentInput"
+      responses:
+        "201":
+          description: Created student
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Student"
+  /students/{id}:
+    delete:
+      operationId: deleteStudent
+      tags: [students]
+      summary: Delete a student
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "204":
+          description: Student deleted
+        "409":
+          description: Student has active issues
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /issues:
+    get:
+      operationId: getIssues
+      tags: [circulation]
+      summary: List issue and return records
+      responses:
+        "200":
+          description: Issue records
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Issue"
+    post:
+      operationId: createIssue
+      tags: [circulation]
+      summary: Issue a book
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IssueInput"
+      responses:
+        "201":
+          description: Created issue
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Issue"
+        "409":
+          description: Book is unavailable or already issued
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /issues/{id}/return:
+    post:
+      operationId: returnIssue
+      tags: [circulation]
+      summary: Return an issued book
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Returned issue
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Issue"
+        "404":
+          $ref: "#/components/responses/NotFound"
 components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+  responses:
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
   schemas:
     HealthStatus:
       type: object
@@ -33,4 +241,165 @@ components:
           type: string
       required:
         - status
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
+    Book:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        author:
+          type: string
+        isbn:
+          type: string
+        category:
+          type: string
+        totalQuantity:
+          type: integer
+        availableQuantity:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, title, author, isbn, category, totalQuantity, availableQuantity, createdAt]
+    BookInput:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+        author:
+          type: string
+          minLength: 1
+        isbn:
+          type: string
+          minLength: 1
+        category:
+          type: string
+          minLength: 1
+        totalQuantity:
+          type: integer
+          minimum: 1
+      required: [title, author, isbn, category, totalQuantity]
+    BookUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+        author:
+          type: string
+          minLength: 1
+        isbn:
+          type: string
+          minLength: 1
+        category:
+          type: string
+          minLength: 1
+        totalQuantity:
+          type: integer
+          minimum: 1
+    Student:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        rollNumber:
+          type: string
+        department:
+          type: string
+        year:
+          type: integer
+        email:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, name, rollNumber, department, year, email, createdAt]
+    StudentInput:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        rollNumber:
+          type: string
+          minLength: 1
+        department:
+          type: string
+          minLength: 1
+        year:
+          type: integer
+          minimum: 1
+          maximum: 6
+        email:
+          type: string
+          format: email
+      required: [name, rollNumber, department, year, email]
+    Issue:
+      type: object
+      properties:
+        id:
+          type: integer
+        bookId:
+          type: integer
+        studentId:
+          type: integer
+        bookTitle:
+          type: string
+        studentName:
+          type: string
+        rollNumber:
+          type: string
+        issueDate:
+          type: string
+          format: date
+        dueDate:
+          type: string
+          format: date
+        returnDate:
+          type: [string, "null"]
+          format: date
+        status:
+          type: string
+          enum: [issued, returned, overdue]
+      required: [id, bookId, studentId, bookTitle, studentName, rollNumber, issueDate, dueDate, returnDate, status]
+    IssueInput:
+      type: object
+      properties:
+        bookId:
+          type: integer
+        studentId:
+          type: integer
+        issueDate:
+          type: string
+          format: date
+        dueDate:
+          type: string
+          format: date
+      required: [bookId, studentId, issueDate, dueDate]
+    DashboardStats:
+      type: object
+      properties:
+        totalBooks:
+          type: integer
+        totalStudents:
+          type: integer
+        issuedBooks:
+          type: integer
+        availableBooks:
+          type: integer
+        recentIssues:
+          type: array
+          items:
+            $ref: "#/components/schemas/Issue"
+      required: [totalBooks, totalStudents, issuedBooks, availableBooks, recentIssues]
 

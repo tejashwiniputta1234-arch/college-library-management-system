@@ -1,0 +1,1 @@
+- [Library storage choice](library-storage.md) — the app uses provisioned PostgreSQL persistence so it runs without an external MongoDB connection.

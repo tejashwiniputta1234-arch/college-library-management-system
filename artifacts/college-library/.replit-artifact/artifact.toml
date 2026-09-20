@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "College Library Management System"
+description = "A responsive library desk for college administrators to manage books, students, and issue-return activity with a clear dashboard and sample data."
+version = "1.0.0"
+id = "artifacts/college-library"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 21169
+
+[services.development]
+run = "pnpm --filter @workspace/college-library run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/college-library", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/college-library/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21169"
+BASE_PATH = "/"
