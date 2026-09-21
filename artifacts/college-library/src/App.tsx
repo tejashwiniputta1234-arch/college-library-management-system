@@ -210,7 +210,7 @@ function Dashboard() {
   const recent = stats?.recentIssues ?? [];
   return <Page>
     <div className="page-head">
-      <div><p className="eyebrow">Monday, 14 October 2024</p><h1>The desk, at a glance.</h1><p className="lede">A clear view of what is available, what is moving, and where a librarian's attention is needed today.</p></div>
+      <div><p className="eyebrow">Saturday, 19 September 2026</p><h1>The desk, at a glance.</h1><p className="lede">A clear view of what is available, what is moving, and where a librarian's attention is needed today.</p></div>
       <Link href="/circulation" className="button button-primary" data-testid="link-dashboard-circulation"><ArrowLeftRight size={16} /> Manage circulation</Link>
     </div>
     {statsQuery.isLoading ? <div className="stats-grid">{Array.from({ length: 4 }).map((_, i) => <div className="stat-card skeleton" key={i} />)}</div> : statsQuery.isError ? <ErrorState message={errorMessage(statsQuery.error)} onRetry={() => statsQuery.refetch()} /> : <>
